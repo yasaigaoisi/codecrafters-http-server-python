@@ -15,7 +15,12 @@ def main():
     elif request_target.split("/")[1] == "echo":
         echo_target = request_target.split("/")[2]
         content_length = len(echo_target)
-        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {content_length}\r\n\r\n{echo_target}"
+        response = (
+            f"HTTP/1.1 200 OK\r\n" +
+            f"Content-Type: text/plain\r\n" +
+            f"Content-Length: {content_length}\r\n\r\n" +
+            f"{echo_target}"
+        )
         conn.sendall(response.encode())
     else:
         conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
