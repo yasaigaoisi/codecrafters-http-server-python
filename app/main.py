@@ -6,7 +6,14 @@ def main():
 
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     conn, address = server_socket.accept() # wait for client
-    conn.sendall("HTTP/1.1 200 OK\r\n\r\n".encode())
+    data = conn.recv(1024)
+    decoded_data = data.decode()
+    request_line = decoded_data.split("\r\n")[0]
+    request_target = request_line.split()[1]
+    if request_target == "/":
+        conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+    else:
+        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
 
 
 if __name__ == "__main__":
