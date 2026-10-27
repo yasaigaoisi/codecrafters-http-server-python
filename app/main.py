@@ -10,6 +10,7 @@ def main():
     decoded_data = data.decode()
     request_line = decoded_data.splitlines()[0]
     request_target = request_line.split()[1]
+    user_agent = decoded_data.splitlines()[2].split()[1]
     if request_target == "/":
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
     elif request_target.split("/")[1] == "echo":
@@ -20,6 +21,14 @@ def main():
             f"Content-Type: text/plain\r\n" +
             f"Content-Length: {content_length}\r\n\r\n" +
             f"{echo_target}"
+        )
+        conn.sendall(response.encode())
+    elif request_target.split("/")[1] == "user-agent":
+        response = (
+            f"HTTP/1.1 200 OK\r\n" +
+            f"Content-Type: text/plain\r\n" +
+            f"Content-Length: {content_length}\r\n\r\n" +
+            f"{user_agent}"
         )
         conn.sendall(response.encode())
     else:
