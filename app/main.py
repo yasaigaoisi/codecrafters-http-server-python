@@ -26,7 +26,6 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
         conn, address = server_socket.accept() # wait for client
-        # with conn:
         data = conn.recv(1024)
 
         decoded_data = data.decode()
