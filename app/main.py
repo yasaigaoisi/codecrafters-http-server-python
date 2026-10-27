@@ -1,16 +1,31 @@
 import socket  # noqa: F401
 
 
+def structure(data: str):
+    etc, request_body = data.split("\r\n\r\n")
+    request_line, headers_array = etc.split("\r\n")[0], etc.split("\r\n")[1:]
+    headers = {}
+    for header in headers_array:
+        key, value = header.split()
+        headers[key.split(":")[0]] = value
+
+    return (
+        request_line,
+        headers,
+        request_body
+    )
+
 def main():
     print("Logs from your program will appear here!")
 
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     conn, address = server_socket.accept() # wait for client
     data = conn.recv(1024)
+
     decoded_data = data.decode()
-    request_line = decoded_data.splitlines()[0]
+    request_line, headers, request_body = structure(decoded_data)
     request_target = request_line.split()[1]
-    user_agent = decoded_data.splitlines()[3].split()[1]
+    user_agent = headers.get("User-Agent")
     if request_target == "/":
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
     elif request_target.split("/")[1] == "echo":
