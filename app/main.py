@@ -24,6 +24,7 @@ def main():
         )
         conn.sendall(response.encode())
     elif request_target.split("/")[1] == "user-agent":
+        content_length = len(user_agent)
         response = (
             f"HTTP/1.1 200 OK\r\n" +
             f"Content-Type: text/plain\r\n" +
