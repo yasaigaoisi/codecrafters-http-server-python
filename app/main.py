@@ -32,6 +32,7 @@ def main():
         decoded_data = data.decode()
         request_line, headers, request_body = structure(decoded_data)
         request_target = request_line.split()[1]
+        print(request_target)
         if request_target == "/":
             print("root request")
             conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
