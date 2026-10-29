@@ -32,8 +32,10 @@ def main():
         request_line, headers, request_body = structure(decoded_data)
         request_target = request_line.split()[1]
         if request_target == "/":
+            printf("if")
             conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
         elif request_target.split("/")[1] == "echo":
+            printf("elif1")
             echo_target = request_target.split("/")[2]
             content_length = len(echo_target)
             response = (
@@ -44,6 +46,7 @@ def main():
             )
             conn.sendall(response.encode())
         elif request_target.split("/")[1] == "user-agent":
+            printf("elif2")
             user_agent = headers.get("User-Agent")
             content_length = len(user_agent)
             response = (
@@ -54,6 +57,7 @@ def main():
             )
             conn.sendall(response.encode())
         else:
+            printf("else")
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
         conn.close()
 
