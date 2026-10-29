@@ -31,9 +31,7 @@ def main():
         decoded_data = data.decode()
         request_line, headers, request_body = structure(decoded_data)
         request_target = request_line.split()[1]
-        printf(request_target)
         if request_target == "/":
-            printf("root request")
             conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
         elif request_target.split("/")[1] == "echo":
             echo_target = request_target.split("/")[2]
