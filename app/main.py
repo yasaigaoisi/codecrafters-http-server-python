@@ -1,4 +1,5 @@
 import argparse
+import gzip
 import os
 import socket  # noqa: F401
 from threading import Thread
@@ -32,17 +33,21 @@ def handle_request(conn, root_path):
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
     elif request_target.split("/")[1] == "echo":
         body = request_target.split("/")[2]
-        content_length = len(body)
         response_headers = (
-            "Content-Type: text/plain\r\n" +
-            f"Content-Length: {content_length}\r\n"
+            "Content-Type: text/plain\r\n"
         )
         if request_headers.get("Accept-Encoding") and \
             ("gzip" in request_headers.get("Accept-Encoding")):
+            body = gzip.compress(body.encode())
             response_headers += (
                 response_headers +
                 f"Content-Encoding: gzip\r\n"
             )
+        content_length = len(body)
+        response_headers += (
+            response_headers +
+            f"Content-Length: {content_length}\r\n"
+        )
         response = (
             "HTTP/1.1 200 OK\r\n" +
             f"{response_headers}" +
