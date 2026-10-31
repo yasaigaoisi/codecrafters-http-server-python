@@ -14,7 +14,7 @@ def structure(data: str):
     request_line, headers_array = etc.split("\r\n")[0], etc.split("\r\n")[1:]
     headers = {}
     for header in headers_array:
-        key, value = header.split(":")
+        key, value = header.split(": ")
         headers[key.split(":")[0]] = value
 
     return (
