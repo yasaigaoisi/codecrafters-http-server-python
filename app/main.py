@@ -100,6 +100,7 @@ def handle_request(conn, root_path):
             elif request_method == "POST":
                 file_obj = open(file_path, "w")
                 file_obj.write(request_body)
+                file_obj.read()
                 conn.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
         else:
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
