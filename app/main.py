@@ -34,7 +34,13 @@ def handle_request(conn, root_path):
             request_line, request_headers, request_body = structure(decoded_data)
             request_method, request_target, protocol = request_line.split()
 
-            if request_headers.get("Connection") == "close": break
+            if request_headers.get("Connection") == "close":
+                response = (
+                    "HTTP/1.1 200 OK\r\n" +
+                    "Connection: close\r\n\r\n"
+                )
+                conn.sendall(response.encode())
+                break
 
             if request_target == "/":
                 conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
