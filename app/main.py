@@ -26,26 +26,35 @@ def structure(data: str):
 def handle_request(conn, root_path):
     data = conn.recv(1024)
     decoded_data = data.decode()
-    request_line, headers, request_body = structure(decoded_data)
+    request_line, request_headers, request_body = structure(decoded_data)
     request_method, request_target, protocol = request_line.split()
     if request_target == "/":
         conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
     elif request_target.split("/")[1] == "echo":
-        echo_target = request_target.split("/")[2]
-        content_length = len(echo_target)
+        body = request_target.split("/")[2]
+        content_length = len(body)
+        response_headers = (
+            "Content-Type: text/plain\r\n" +
+            f"Content-Length: {content_length}\r\n"
+        )
+        if request_headers.get("Accept-Encoding") == "gzip":
+            response_headers += (
+                response_headers +
+                f"Content-Encoding: gzip"
+            )
         response = (
-            f"HTTP/1.1 200 OK\r\n" +
-            f"Content-Type: text/plain\r\n" +
-            f"Content-Length: {content_length}\r\n\r\n" +
-            f"{echo_target}"
+            "HTTP/1.1 200 OK\r\n" +
+            f"{response_headers}" +
+            "\n" +
+            f"{body}"
         )
         conn.sendall(response.encode())
     elif request_target.split("/")[1] == "user-agent":
-        user_agent = headers.get("User-Agent")
+        user_agent = request_headers.get("User-Agent")
         content_length = len(user_agent)
         response = (
-            f"HTTP/1.1 200 OK\r\n" +
-            f"Content-Type: text/plain\r\n" +
+            "HTTP/1.1 200 OK\r\n" +
+            "Content-Type: text/plain\r\n" +
             f"Content-Length: {content_length}\r\n\r\n" +
             f"{user_agent}"
         )
@@ -59,8 +68,8 @@ def handle_request(conn, root_path):
                 file_contents = file_obj.read()
                 content_length = len(file_contents)
                 response = (
-                    f"HTTP/1.1 200 OK\r\n" +
-                    f"Content-Type: application/octet-stream\r\n" +
+                    "HTTP/1.1 200 OK\r\n" +
+                    "Content-Type: application/octet-stream\r\n" +
                     f"Content-Length: {content_length}\r\n\r\n" +
                     f"{file_contents}"
                 )
