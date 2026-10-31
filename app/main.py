@@ -58,7 +58,7 @@ def handle_request(conn, root_path):
             content_length = len(file_contents)
             response = (
                 f"HTTP/1.1 200 OK\r\n" +
-                f"Content-Type: octet-stream\r\n" +
+                f"Content-Type: application/octet-stream\r\n" +
                 f"Content-Length: {content_length}\r\n\r\n" +
                 f"{file_contents}"
             )
