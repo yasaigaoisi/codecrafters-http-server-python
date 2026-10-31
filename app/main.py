@@ -94,6 +94,7 @@ def handle_request(conn, root_path):
                 response_headers = ""
                 response_body = ""
 
+            print(request_headers)
             if request_headers.get("Connection") == "close":
                 response_headers = (
                     response_headers +
