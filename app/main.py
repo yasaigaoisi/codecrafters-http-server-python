@@ -64,7 +64,7 @@ def handle_request(conn, root_path):
                 content_length = len(response_body)
                 response_headers = (
                     "Content-Type: text/plain\r\n" +
-                    f"Content-Length: {content_length}\r\n\r\n"
+                    f"Content-Length: {content_length}\r\n"
                 )
             elif request_target.split("/")[1] == "files":
                 file_name = request_target.split("/")[2]
