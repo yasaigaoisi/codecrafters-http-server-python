@@ -49,12 +49,14 @@ def handle_request(conn, root_path):
             f"Content-Length: {content_length}\r\n"
         )
         response = (
-            "HTTP/1.1 200 OK\r\n" +
-            f"{response_headers}" +
-            "\r\n" +
-            f"{body}"
+            (
+                "HTTP/1.1 200 OK\r\n" +
+                f"{response_headers}" +
+                "\r\n"
+            ).encode() +
+            body
         )
-        conn.sendall(response.encode())
+        conn.sendall(response)
     elif request_target.split("/")[1] == "user-agent":
         user_agent = request_headers.get("User-Agent")
         content_length = len(user_agent)
