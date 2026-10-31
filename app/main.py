@@ -40,7 +40,7 @@ def handle_request(conn, root_path):
         if request_headers.get("Accept-Encoding") == "gzip":
             response_headers += (
                 response_headers +
-                f"Content-Encoding: gzip"
+                f"Content-Encoding: gzip\r\n"
             )
         response = (
             "HTTP/1.1 200 OK\r\n" +
