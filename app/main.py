@@ -77,7 +77,7 @@ def handle_request(conn, root_path):
                         content_length = len(response_body)
                         response_headers = (
                             "Content-Type: application/octet-stream\r\n" +
-                            f"Content-Length: {content_length}\r\n\r\n"
+                            f"Content-Length: {content_length}\r\n"
                         )
                     except OSError as e:
                         response_line = "HTTP/1.1 404 Not Found"
