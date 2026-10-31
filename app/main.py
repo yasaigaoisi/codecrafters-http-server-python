@@ -39,23 +39,32 @@ def handle_request(conn, root_path):
         if request_headers.get("Accept-Encoding") and \
             ("gzip" in request_headers.get("Accept-Encoding")):
             body = gzip.compress(body.encode())
+            content_length = len(body)
             response_headers += (
                 response_headers +
-                f"Content-Encoding: gzip\r\n"
+                f"Content-Encoding: gzip\r\n" +
+                f"Content-Length: {content_length}\r\n"
             )
-        content_length = len(body)
-        response_headers += (
-            response_headers +
-            f"Content-Length: {content_length}\r\n"
-        )
-        response = (
-            (
+            response = (
+                (
+                    "HTTP/1.1 200 OK\r\n" +
+                    f"{response_headers}" +
+                    "\r\n"
+                ).encode() +
+                body
+            )
+        else:
+            content_length = len(body)
+            response_headers += (
+                response_headers +
+                f"Content-Length: {content_length}\r\n"
+            )
+            response = (
                 "HTTP/1.1 200 OK\r\n" +
                 f"{response_headers}" +
-                "\r\n"
-            ).encode() +
-            body
-        )
+                "\r\n" +
+                body
+            ).encode()
         conn.sendall(response)
     elif request_target.split("/")[1] == "user-agent":
         user_agent = request_headers.get("User-Agent")
