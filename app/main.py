@@ -34,37 +34,23 @@ def handle_request(conn, root_path):
             request_line, request_headers, request_body = structure(decoded_data)
             request_method, request_target, protocol = request_line.split()
 
-            if request_headers.get("Connection") == "close":
-                response = (
-                    "HTTP/1.1 200 OK\r\n" +
-                    "Connection: close\r\n\r\n"
-                )
-                conn.sendall(response.encode())
-                break
 
             if request_target == "/":
-                conn.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
+                response_line = "HTTP/1.1 200 OK"
+                response_headers = ""
+                response_body = ""
             elif request_target.split("/")[1] == "echo":
-                body = request_target.split("/")[2]
-                response_headers = (
-                    "Content-Type: text/plain\r\n"
-                )
+                response_line = "HTTP/1.1 200 OK"
+                response_headers = "Content-Type: text/plain\r\n"
+                response_body = request_target.split("/")[2]
                 if request_headers.get("Accept-Encoding") and \
                     ("gzip" in request_headers.get("Accept-Encoding")):
-                    body = gzip.compress(body.encode())
-                    content_length = len(body)
+                    response_body = gzip.compress(response_body.encode())
+                    content_length = len(response_body)
                     response_headers += (
                         response_headers +
-                        f"Content-Encoding: gzip\r\n" +
+                        "Content-Encoding: gzip\r\n" +
                         f"Content-Length: {content_length}\r\n"
-                    )
-                    response = (
-                        (
-                            "HTTP/1.1 200 OK\r\n" +
-                            f"{response_headers}" +
-                            "\r\n"
-                        ).encode() +
-                        body
                     )
                 else:
                     content_length = len(body)
@@ -72,46 +58,67 @@ def handle_request(conn, root_path):
                         response_headers +
                         f"Content-Length: {content_length}\r\n"
                     )
-                    response = (
-                        "HTTP/1.1 200 OK\r\n" +
-                        f"{response_headers}" +
-                        "\r\n" +
-                        body
-                    ).encode()
-                conn.sendall(response)
             elif request_target.split("/")[1] == "user-agent":
-                user_agent = request_headers.get("User-Agent")
-                content_length = len(user_agent)
-                response = (
-                    "HTTP/1.1 200 OK\r\n" +
+                response_line = "HTTP/1.1 200 OK"
+                response_body = request_headers.get("User-Agent")
+                content_length = len(response_body)
+                response_headers = (
                     "Content-Type: text/plain\r\n" +
-                    f"Content-Length: {content_length}\r\n\r\n" +
-                    f"{user_agent}"
+                    f"Content-Length: {content_length}\r\n\r\n"
                 )
-                conn.sendall(response.encode())
             elif request_target.split("/")[1] == "files":
                 file_name = request_target.split("/")[2]
                 file_path = os.path.join(root_path, file_name)
                 if request_method == "GET":
                     try:
+                        response_line = "HTTP/1.1 200 OK"
                         file_obj = open(file_path)
-                        file_contents = file_obj.read()
-                        content_length = len(file_contents)
-                        response = (
-                            "HTTP/1.1 200 OK\r\n" +
+                        response_body = file_obj.read()
+                        content_length = len(response_body)
+                        response_headers = (
                             "Content-Type: application/octet-stream\r\n" +
-                            f"Content-Length: {content_length}\r\n\r\n" +
-                            f"{file_contents}"
+                            f"Content-Length: {content_length}\r\n\r\n"
                         )
-                        conn.sendall(response.encode())
                     except OSError as e:
-                        conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+                        response_line = "HTTP/1.1 404 Not Found"
+                        response_headers = ""
+                        response_body = ""
                 elif request_method == "POST":
                     with open(file_path, "w") as file_obj:
                         file_obj.write(request_body)
-                    conn.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
+                    response_line = "HTTP/1.1 201 Created"
+                    response_headers = ""
+                    response_body = ""
             else:
-                conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+                response_line = "HTTP/1.1 404 Not Found"
+                response_headers = ""
+                response_body = ""
+
+            if request_headers.get("Connection") == "close":
+                response_headers = (
+                    response_headers +
+                    "Connection: close\r\n"
+                )
+
+            if request_headers.get("Accept-Encoding") and \
+                ("gzip" in request_headers.get("Accept-Encoding")):
+                response = (
+                    (
+                        f"{response_line}\r\n" +
+                        f"{response_headers}\r\n"
+                    ).encode() +
+                    response_body
+                )
+            else:
+                response = (
+                    f"{response_line}\r\n" +
+                    f"{response_headers}\r\n" +
+                    response_body
+                ).encode()
+
+            conn.sendall(response)
+
+            if request_headers.get("Connection") == "close": break
 
 def main():
     print("Logs from your program will appear here!")
