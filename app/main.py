@@ -101,6 +101,8 @@ def handle_request(conn, root_path):
                     "Connection: close\r\n"
                 )
 
+            print(response_headers)
+
             if request_headers.get("Accept-Encoding") and \
                 ("gzip" in request_headers.get("Accept-Encoding")):
                 response = (
