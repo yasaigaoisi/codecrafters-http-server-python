@@ -98,9 +98,9 @@ def handle_request(conn, root_path):
                 except OSError as e:
                     conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
             elif request_method == "POST":
-                file_obj = open(file_path, 'rw')
+                file_obj = open(file_path, 'w')
                 file_obj.write(request_body)
-                file_obj.read()
+                file_obj.close()
                 conn.sendall(b"HTTP/1.1 201 Created\r\n\r\n")
         else:
             conn.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
