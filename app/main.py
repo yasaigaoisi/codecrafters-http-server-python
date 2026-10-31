@@ -53,7 +53,7 @@ def handle_request(conn, root_path):
                         f"Content-Length: {content_length}\r\n"
                     )
                 else:
-                    content_length = len(body)
+                    content_length = len(response_body)
                     response_headers += (
                         response_headers +
                         f"Content-Length: {content_length}\r\n"
