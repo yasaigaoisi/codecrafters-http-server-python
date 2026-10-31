@@ -45,7 +45,7 @@ def handle_request(conn, root_path):
         response = (
             "HTTP/1.1 200 OK\r\n" +
             f"{response_headers}" +
-            "\n" +
+            "\r\n" +
             f"{body}"
         )
         conn.sendall(response.encode())
