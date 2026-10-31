@@ -37,7 +37,8 @@ def handle_request(conn, root_path):
             "Content-Type: text/plain\r\n" +
             f"Content-Length: {content_length}\r\n"
         )
-        if "gzip" in request_headers.get("Accept-Encoding"):
+        if request_headers.get("Accept-Encoding") &
+            "gzip" in request_headers.get("Accept-Encoding"):
             response_headers += (
                 response_headers +
                 f"Content-Encoding: gzip\r\n"
