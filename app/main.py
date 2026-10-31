@@ -27,7 +27,7 @@ def structure(data: str):
 def handle_request(conn, root_path):
     with conn:
         while True:
-            data = conn.recv(1024)
+            data = conn.recv(2048)
             if not data:
                 break
             decoded_data = data.decode()
